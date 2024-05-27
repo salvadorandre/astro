@@ -1,0 +1,69 @@
+---
+import { getLatestLaunchesById, getLatestLaunches } from "../../services/spacex"
+import Layout from "../../layouts/Layout.astro";
+
+const { id } = Astro.params
+
+export const prerender = false; 
+
+
+if(Astro.cookies.get('user')) { 
+}
+
+console.log('this is ', {id})
+let data; 
+
+if(id) { 
+    data = await getLatestLaunchesById({ id });
+}
+
+
+export async function getStaticPaths(){
+
+    const Launches = await getLatestLaunches();
+    
+    return Launches.map((launche) => ({
+        params: {id: launche.id}
+    })); 
+}
+---
+
+<Layout title=`Card #${data!.flight_number}`>
+    <article class="flex gap-y-4 flex-col">
+        <img class="w-52 h-auto" src={data?.links.patch.large} alt="">
+
+        <h2 class="text-4xl text-white font-bold">Launch #{data?.flight_number}</h2>
+
+        <p class="text-lg">{data?.details}</p>
+    </article>
+</Layout>
+
+<style>
+
+    img { 
+        animation-duration: 2s;
+        animation-name: image;
+    }
+
+
+    @keyframes image { 
+        from {  
+            margin-left: 100%;
+            opacity: 0;
+            filter: drop-shadow(5px 5px 25px rgb(184, 15, 15));
+        }
+
+        to { 
+            margin-left: 0%;
+            width: 24%;
+
+        }
+    }
+    article { 
+        padding: 1em;
+        border: 1px solid white;
+        border-radius: 15px;
+
+        box-shadow: 0 0 5px white;
+    }
+</style>
